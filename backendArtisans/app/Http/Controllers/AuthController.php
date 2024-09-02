@@ -52,6 +52,27 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            / Vérifier si un panier existe dans la session
+                if (Session::has('cart')) {
+                    $cart = Session::get('cart');
+
+                    // Associer le panier à l'utilisateur
+                    $order = $cart['order'];
+                    $order->user_id = $user->id;
+                    $order->save();
+
+                    // Sauvegarder les produits associés à l'ordre
+                    foreach ($cart['items'] as $item) {
+                        $order->products()->attach($item['product_id'], [
+                            'quantity' => $item['quantity'],
+                            'price_at_purchase' => $item['price_at_purchase']
+                        ]);
+                    }
+
+                    // Effacer le panier de la session
+                    Session::forget('cart');
+                }
+
             return response()->json([
                 'message' => 'Login successful',
                 'access_token' => $token,
