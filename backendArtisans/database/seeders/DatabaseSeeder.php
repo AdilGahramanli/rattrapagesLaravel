@@ -24,5 +24,15 @@ class DatabaseSeeder extends Seeder
                     AdminUserSeeder::class, // Ajout du seeder AdminUserSeeder
                     ProductSeeder::class
                 ]);
+
+
+
+        // Créer des artisans avec des stores associés
+        User::factory()
+            ->count(5) // Nombre d'artisans
+            ->has(Store::factory()->count(1)) // Chaque artisan a un store
+            ->create();
     }
+
+
 }
